@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>خواندن فصل</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="reader-body">
+
+<header>
+  <div>در حال خواندن</div>
+  <div id="score-display">امتیاز: <span id="score-value">1</span></div>
+</header>
+
+<main class="reader-container" id="reader-main"></main>
+
+<div class="chapter-nav" id="chapter-nav"></div>
+
+<div class="tab-bar">
+  <div class="tab" onclick="history.back()">بازگشت</div>
+</div>
+
+<script src="adivery.global.js"></script>
+<script src="data.js"></script>
+<script src="storage.js"></script>
+<script src="ads.js"></script>
+<script>
+// reader.html script
+
+initAdivery();
+updateScoreUI(); // از storage.js
+
+const urlParams = new URLSearchParams(location.search);
+const comicId = parseInt(urlParams.get('comic'));
+const chapterId = parseInt(urlParams.get('chapter') || '1');
+
+const comic = comics.find(c => c.id === comicId);
+if (!comic) {
+  document.body.innerHTML = "<h1 style='text-align:center; margin-top:100px;'>کمیک یافت نشد</h1>";
+}
+
+const chapter = comic.chapters.find(ch => ch.id === chapterId);
+if (!chapter) {
+  document.body.innerHTML = "<h1 style='text-align:center; margin-top:100px;'>فصل یافت نشد</h1>";
+}
+
+const canRead = spendScoreIfNeeded(comicId, chapterId);
+if (!canRead) {
+  alert("امتیاز کافی نیست! لطفاً از تب امتیاز تبلیغ ببینید.");
+  history.back();
+}
+
+const main = document.getElementById('reader-main');
+chapter.pages.forEach(page => {
+  const img = document.createElement('img');
+  img.className = 'reader-img';
+  img.src = page;
+  img.alt = "صفحه کمیک";
+  img.loading = "lazy";
+  main.appendChild(img);
+});
+
+// ناوبری فصل‌ها
+const nav = document.getElementById('chapter-nav');
+let navHTML = '';
+comic.chapters.forEach(ch => {
+  navHTML += `<button onclick="location.href='reader.html?comic=\( {comicId}&chapter= \){ch.id}'" \( {ch.id===chapterId?'style=background:#555;':''}> \){ch.id}</button> `;
+});
+nav.innerHTML = navHTML;
+nav.style.display = 'block';
+
+// immersive mode (کلیک روی صفحه)
+let isImmersive = false;
+document.addEventListener('click', e => {
+  if (e.target.tagName === 'IMG' || e.target.id === 'reader-main') {
+    isImmersive = !isImmersive;
+    document.body.classList.toggle('immersive', isImmersive);
+  }
+});
+
