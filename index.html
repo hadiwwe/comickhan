@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>کمیک خوان</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div>کمیک خوان</div>
+  <div id="score-display">امتیاز: <span id="score-value">1</span></div>
+</header>
+
+<main>
+  <div id="comics-tab">
+    <h2 style="text-align:center; margin:20px 0;">کمیک‌ها</h2>
+    <div id="comics-list"></div>
+  </div>
+
+  <div id="score-tab" style="display:none; text-align:center; padding:40px 20px;">
+    <h2>امتیاز من</h2>
+    <p style="font-size:1.4em; margin:20px 0;">امتیاز فعلی: <span id="score-value-big">1</span></p>
+    <p>هر تبلیغ کامل → +۲ امتیاز</p>
+    <button onclick="watchAdForReward()" style="padding:12px 30px; font-size:1.1em; background:#4CAF50; border:none; border-radius:8px; color:white; cursor:pointer;">
+      تماشای تبلیغ جایزه‌دار
+    </button>
+  </div>
+</main>
+
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('comics')">کمیک‌ها</div>
+  <div class="tab" onclick="switchTab('score')">امتیاز</div>
+</div>
+
+<script src="adivery.global.js"></script>
+<script src="data.js"></script>
+<script src="storage.js"></script>
+<script src="ads.js"></script>
+<script>
+// index.html script
+
+initAdivery();
+
+function updateScoreUI() {
+  const score = getScore();
+  document.getElementById('score-value').textContent = score;
+  document.getElementById('score-value-big').textContent = score;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+
+  document.getElementById('comics-tab').style.display = tab === 'comics' ? 'block' : 'none';
+  document.getElementById('score-tab').style.display = tab === 'score' ? 'block' : 'none';
+}
+
+function renderComics() {
+  const list = document.getElementById('comics-list');
+  list.innerHTML = '';
+  comics.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="\( {c.cover}" alt=" \){c.title}">
+      <div style="padding:12px;">
+        <h3>${c.title}</h3>
+        <p>${c.summary.substring(0,80)}...</p>
+        <small>${c.chaptersCount} فصل</small>
+      </div>
+    `;
+    card.onclick = () => {
+      location.href = `reader.html?comic=${c.id}`;
+    };
+    list.appendChild(card);
+  });
+}
+
+window.onload = () => {
+  updateScoreUI();
+  renderComics();
+};
+</script>
+</body>
+</html>
