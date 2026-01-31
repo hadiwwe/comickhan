@@ -1,0 +1,15 @@
+/* style.css */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: system-ui, sans-serif; background:#0f0f0f; color:#eee; direction:rtl; }
+header { position:fixed; top:0; left:0; right:0; height:50px; background:#1a1a1a; display:flex; align-items:center; justify-content:space-between; padding:0 15px; z-index:100; }
+#score-display { cursor:pointer; }
+main { padding:60px 10px 80px; }
+.card { background:#222; border-radius:12px; margin:15px 0; overflow:hidden; cursor:pointer; }
+.card img { width:100%; height:auto; display:block; }
+.tab-bar { position:fixed; bottom:0; left:0; right:0; height:60px; background:#1a1a1a; display:flex; }
+.tab { flex:1; text-align:center; padding:18px 0; cursor:pointer; }
+.tab.active { background:#333; }
+.reader-container { padding:10px; background:#000; }
+.reader-img { width:100%; display:block; margin-bottom:2px; }
+.chapter-nav { position:fixed; bottom:70px; left:0; right:0; text-align:center; z-index:50; background:rgba(0,0,0,0.6); padding:8px; display:none; }
+.immersive .chapter-nav, .immersive header, .immersive .tab-bar { display:none !important; }
