@@ -53,13 +53,12 @@
   <div class="tab" onclick="switchTab(event, 'score')">امتیاز</div>
 </div>
 
-<script src="adivery.global.js"></script>
 <script src="data.js"></script>
 <script src="storage.js"></script>
 <script src="ads.js"></script>
 
 <script>
-initAdivery();
+
 
 window.updateScoreUI = function() {
   const score = window.getScore ? window.getScore() : 1;
