@@ -1,51 +1,132 @@
+function watchAdForReward() {
+  showFakeAdStory(() => {
+    rewardUser(20);
+  });
+}
 
+function rewardUser(points) {
+  let current = 0;
 
-const APP_ID = "83fc9705-8bb6-45ab-90cc-d3f145a774a1";
-const REWARDED_PLACEMENT = "60a72aa7-d023-457b-9232-fb2f1782face";
+  // گرفتن امتیاز فعلی
+  if (typeof window.getScore === "function") {
+    current = window.getScore() || 0;
+  } else if (localStorage.getItem("comicScore")) {
+    current = parseInt(localStorage.getItem("comicScore"), 10) || 0;
+  }
 
-function initAdivery() {
-  if (typeof Adivery !== 'undefined') {
-    Adivery.configure(APP_ID);
-    console.log("[Adivery] Configure انجام شد – آماده برای درخواست تبلیغ");
+  const next = current + points;
+
+  // ذخیره امتیاز جدید
+  if (typeof window.setScore === "function") {
+    window.setScore(next);
   } else {
-    console.error("[Adivery] کتابخانه Adivery لود نشده است. فایل adivery.global.js مشکل دارد.");
+    localStorage.setItem("comicScore", String(next));
+  }
+
+  // آپدیت UI
+  if (typeof window.updateScoreUI === "function") {
+    window.updateScoreUI();
   }
 }
 
-async function watchAdForReward() {
-  console.log("[تبلیغ] دکمه کلیک شد – شروع فرآیند");
+function showFakeAdStory(onFinish) {
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100%";
+  overlay.style.height = "100%";
+  overlay.style.background = "rgba(0,0,0,0.92)";
+  overlay.style.display = "flex";
+  overlay.style.flexDirection = "column";
+  overlay.style.justifyContent = "center";
+  overlay.style.alignItems = "center";
+  overlay.style.zIndex = "999999";
+  overlay.style.animation = "fadeIn 0.4s ease";
 
-  if (typeof Adivery === 'undefined') {
-    console.error("[تبلیغ] Adivery تعریف نشده");
-    alert("کتابخانه تبلیغ لود نشده است. صفحه را رفرش کنید یا بعدا امتحان کنید.");
-    return;
-  }
+  // تصویر
+  const img = document.createElement("img");
+  img.src = "https://app.puzzley.net/uploads/user/rWvb/کمیک/کلی/CH1_001.jpeg";
+  img.style.maxWidth = "90%";
+  img.style.maxHeight = "75%";
+  img.style.borderRadius = "14px";
+  img.style.boxShadow = "0 8px 25px rgba(0,0,0,0.5)";
+  img.style.cursor = "pointer";
+  img.style.animation = "zoomIn 0.5s ease";
 
-  try {
-    console.log("[تبلیغ] درخواست تبلیغ جایزه‌ای...");
-    const ad = await Adivery.requestRewardedAd(REWARDED_PLACEMENT);
-    console.log("[تبلیغ] تبلیغ با موفقیت لود شد");
+  img.onclick = () => {
+    window.open("https://freefiremax.ir", "_blank");
+  };
 
-    console.log("[تبلیغ] حالا تبلیغ نمایش داده می‌شود...");
-    const isRewarded = await ad.show();
-    console.log("[تبلیغ] نتیجه نمایش تبلیغ:", isRewarded);
+  // نوار پیشرفت
+  const barContainer = document.createElement("div");
+  barContainer.style.width = "90%";
+  barContainer.style.height = "6px";
+  barContainer.style.background = "rgba(255,255,255,0.25)";
+  barContainer.style.borderRadius = "4px";
+  barContainer.style.marginTop = "20px";
+  barContainer.style.overflow = "hidden";
 
-    if (isRewarded === true) {
-      let score = window.getScore ? window.getScore() : 20;
-      score += 20;
-      window.setScore(score);
-      console.log("[تبلیغ] جایزه داده شد – امتیاز جدید:", score);
-      alert("عالی بود! +۲۰ امتیاز اضافه شد 🎉");
+  const bar = document.createElement("div");
+  bar.style.width = "0%";
+  bar.style.height = "100%";
+  bar.style.background = "#ffcc00";
+  bar.style.transition = "width 5s linear";
 
-      if (typeof window.updateScoreUI === 'function') {
-        window.updateScoreUI();
-      }
-    } else {
-      console.log("[تبلیغ] جایزه تعلق نگرفت (isRewarded = false)");
-      alert("تبلیغ کامل دیده نشد یا جایزه داده نشد.");
+  barContainer.appendChild(bar);
+
+  // دکمه رد کردن
+  const skipBtn = document.createElement("div");
+  skipBtn.innerText = "رد کردن";
+  skipBtn.style.position = "absolute";
+  skipBtn.style.top = "20px";
+  skipBtn.style.left = "20px";
+  skipBtn.style.padding = "8px 18px";
+  skipBtn.style.background = "rgba(0,0,0,0.5)";
+  skipBtn.style.color = "white";
+  skipBtn.style.fontSize = "1.1rem";
+  skipBtn.style.borderRadius = "20px";
+  skipBtn.style.cursor = "pointer";
+  skipBtn.style.backdropFilter = "blur(4px)";
+  skipBtn.style.transition = "0.2s";
+
+  skipBtn.onmouseenter = () => skipBtn.style.background = "rgba(255,255,255,0.25)";
+  skipBtn.onmouseleave = () => skipBtn.style.background = "rgba(0,0,0,0.5)";
+
+  skipBtn.onclick = () => {
+    overlay.remove();
+    if (onFinish) onFinish();
+  };
+
+  overlay.appendChild(skipBtn);
+  overlay.appendChild(img);
+  overlay.appendChild(barContainer);
+  document.body.appendChild(overlay);
+
+  // شروع انیمیشن
+  setTimeout(() => {
+    bar.style.width = "100%";
+  }, 50);
+
+  // پایان خودکار بعد از ۵ ثانیه
+  setTimeout(() => {
+    if (document.body.contains(overlay)) {
+      overlay.remove();
+      if (onFinish) onFinish();
     }
-  } catch (err) {
-    console.error("[تبلیغ] خطا در فرآیند:", err);
-    alert("خطا در بارگذاری یا نمایش تبلیغ:\n" + (err.message || "نامشخص") + "\nبعداً امتحان کنید.");
-  }
+  }, 5000);
+
+  // انیمیشن‌های CSS
+  const style = document.createElement("style");
+  style.innerHTML = `
+    @keyframes fadeIn {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+    @keyframes zoomIn {
+      from { transform: scale(0.85); opacity: 0 }
+      to { transform: scale(1); opacity: 1 }
+    }
+  `;
+  document.head.appendChild(style);
 }
