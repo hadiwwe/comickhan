@@ -5,31 +5,45 @@ function watchAdForReward() {
 }
 
 function rewardUser(points) {
-  let current = 0;
-
-  // گرفتن امتیاز فعلی
-  if (typeof window.getScore === "function") {
-    current = window.getScore() || 0;
-  } else if (localStorage.getItem("comicScore")) {
-    current = parseInt(localStorage.getItem("comicScore"), 10) || 0;
-  }
-
+  let current = window.getScore() || 0;
   const next = current + points;
+  window.setScore(next);
 
-  // ذخیره امتیاز جدید
-  if (typeof window.setScore === "function") {
-    window.setScore(next);
-  } else {
-    localStorage.setItem("comicScore", String(next));
-  }
-
-  // آپدیت UI
   if (typeof window.updateScoreUI === "function") {
     window.updateScoreUI();
   }
 }
 
 function showFakeAdStory(onFinish) {
+
+  // ۵ تصویر 
+  const ads = [
+    {
+      img: "https://app.puzzley.net/uploads/user/rWvb/%D8%AC%D8%AF%DB%8C%D8%AF/%D8%AA%D8%B3%D8%AA/d9b82b15b2df59e6d2c6bfc50ba93d4agif.gif?_t=1710686295",
+      link: "https://freefiremax.ir"
+    },
+    {
+      img: "https://app.puzzley.net/uploads/user/rWvb/app118232/test/1000161175_oxNvzOcv2N.jpeg",
+      link: "https://youtu.be/IyK9twVw9N8"
+    },
+    {
+      img: "https://app.puzzley.net/uploads/user/rWvb/app118232/test/1000160526_e0QD1Yjl29.jpeg",
+      link: "https://youtu.be/phaS6r8TPXI"
+    },
+    {
+      img: "https://app.puzzley.net/uploads/user/rWvb/app118232/test/Hello_i_want_202512232040_Ozrtxvsb2k.jpeg",
+      link: "https://youtu.be/BvcduFcbYTY"
+    },
+    {
+      img: "https://app.puzzley.net/uploads/user/rWvb/%D8%AC%D8%AF%DB%8C%D8%AF/4cd4d-16656490643960-1920_compress62.jpg",
+      link: "https://freefiremax.ir"
+    }
+  ];
+
+  // انتخاب تصادفی
+  const randomAd = ads[Math.floor(Math.random() * ads.length)];
+
+  // لایه استوری
   const overlay = document.createElement("div");
   overlay.style.position = "fixed";
   overlay.style.top = "0";
@@ -46,7 +60,7 @@ function showFakeAdStory(onFinish) {
 
   // تصویر
   const img = document.createElement("img");
-  img.src = "https://app.puzzley.net/uploads/user/rWvb/کمیک/کلی/CH1_001.jpeg";
+  img.src = randomAd.img;
   img.style.maxWidth = "90%";
   img.style.maxHeight = "75%";
   img.style.borderRadius = "14px";
@@ -55,7 +69,7 @@ function showFakeAdStory(onFinish) {
   img.style.animation = "zoomIn 0.5s ease";
 
   img.onclick = () => {
-    window.open("https://freefiremax.ir", "_blank");
+    window.open(randomAd.link, "_blank");
   };
 
   // نوار پیشرفت
@@ -75,12 +89,12 @@ function showFakeAdStory(onFinish) {
 
   barContainer.appendChild(bar);
 
-  // دکمه رد کردن
+  // دکمه رد کردن (سمت راست)
   const skipBtn = document.createElement("div");
   skipBtn.innerText = "رد کردن";
   skipBtn.style.position = "absolute";
   skipBtn.style.top = "20px";
-  skipBtn.style.left = "20px";
+  skipBtn.style.right = "20px";   // ← اینجا تغییر کرد
   skipBtn.style.padding = "8px 18px";
   skipBtn.style.background = "rgba(0,0,0,0.5)";
   skipBtn.style.color = "white";
